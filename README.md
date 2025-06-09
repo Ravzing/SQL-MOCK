@@ -31,7 +31,7 @@ This project is a collection of SQL queries and Node.js scripts for exploring an
 To run a SQL file against the database:
 
 ```bash
-sqlite3 movies.db < 1.sql
+cat 1.sql | sqlite3 movies.db
 ```
 
 ### Node.js Scripts
