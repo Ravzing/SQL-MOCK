@@ -1,0 +1,30 @@
+https://dbdiagram.io/
+you can type this code inside this website to get better view of movies.db structure
+
+Table movies {
+  id integer [pk]
+  title text [not null]
+  year numeric
+}
+
+Table people {
+  id integer [pk]
+  name text [not null]
+  birth numeric
+}
+
+Table stars {
+  movie_id integer [not null, ref: > movies.id]
+  person_id integer [not null, ref: > people.id]
+}
+
+Table directors {
+  movie_id integer [not null, ref: > movies.id]
+  person_id integer [not null, ref: > people.id]
+}
+
+Table ratings {
+  movie_id integer [not null, ref: > movies.id]
+  rating real [not null]
+  votes integer [not null]
+}

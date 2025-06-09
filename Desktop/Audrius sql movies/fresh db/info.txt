@@ -1,0 +1,1 @@
+Copy and paste thios movies.db if you alternated movies.db in other folders and need a new clean one

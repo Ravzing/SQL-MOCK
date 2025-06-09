@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM directors JOIN people ON directors.person_id = people.id WHERE people.name = 'Martin Scorsese';
