@@ -157,80 +157,61 @@ ORDER BY collaborations DESC;
 
 </details>
 
-## Level 4 Questions (Advanced Analysis)
+## Level 4 Questions (Advanced Analysis, Inserts to tables)
 
-### Q10. Calculate the average rating difference between movies released in consecutive years (2022-2023, 2021-2022, etc.).
-
-<details>
-<summary>Show SQL</summary>
-
-```
-WITH YearlyAverages AS (
-  SELECT year, AVG(rating) as avg_rating
-  FROM movies
-  JOIN ratings ON movies.id = ratings.movie_id
-  GROUP BY year
-)
-SELECT a.year, a.avg_rating - b.avg_rating as rating_difference
-FROM YearlyAverages a
-JOIN YearlyAverages b ON a.year = b.year + 1
-ORDER BY a.year DESC;
-```
-
-</details>
-
-### Q11. Find "breakthrough years" for directors - the first year when they directed a movie with rating above 8.5.
+### Q10. Insert movies title "Casablanca", realease data - 1942 , and directors name Michael Curtiz
 
 <details>
 <summary>Show SQL</summary>
 
 ```
-WITH RankedMovies AS (
-  SELECT
-    people.name,
-    movies.year,
-    ratings.rating,
-    ROW_NUMBER() OVER (PARTITION BY people.id ORDER BY movies.year) as rn
-  FROM people
-  JOIN directors ON people.id = directors.person_id
-  JOIN movies ON directors.movie_id = movies.id
-  JOIN ratings ON movies.id = ratings.movie_id
-  WHERE ratings.rating > 8.5
-)
-SELECT name, year as breakthrough_year
-FROM RankedMovies
-WHERE rn = 1
-ORDER BY year;
+INSERT INTO movies (title, year)
+VALUES ('Inception', 2010);
+
+INSERT OR IGNORE INTO people (name, birth)
+VALUES ('Christopher Nolan', 1970);
+
+INSERT INTO directors (movie_id, people_id)
+SELECT movies.id, people.id
+FROM movies, people 
+WHERE movies.title = 'Inception' AND movies.year = 2010
+  AND people.name = 'Christopher Nolan' AND people.birth = 1970;
 ```
 
 </details>
 
-### Q12. For each decade (1900s, 1910s, etc.), list the top-rated director based on average movie ratings.
+### Q11. List all people who have both directed and starred in the same movie.
 
 <details>
 <summary>Show SQL</summary>
 
 ```
-WITH DecadeStats AS (
-  SELECT
-    people.name,
-    (movies.year/10)*10 as decade,
-    AVG(ratings.rating) as avg_rating,
-    COUNT(*) as movie_count,
-    RANK() OVER (PARTITION BY (movies.year/10)*10 ORDER BY AVG(ratings.rating) DESC) as rank
-  FROM people
-  JOIN directors ON people.id = directors.person_id
-  JOIN movies ON directors.movie_id = movies.id
-  JOIN ratings ON movies.id = ratings.movie_id
-  GROUP BY people.id, decade
-  HAVING movie_count >= 3
-)
-SELECT decade, name, avg_rating
-FROM DecadeStats
-WHERE rank = 1
-ORDER BY decade DESC;
+SELECT DISTINCT people1.name FROM movies
+JOIN stars AS stars1 ON movies.id = stars1.movie_id
+JOIN people AS people1 ON stars1.person_id = people1.id
+JOIN directors AS directors2 ON movies.id = directors2.movie_id
+JOIN people AS people2 ON directors2.person_id = people2.id
+WHERE people1.id = people2.id
 ```
 
 </details>
 
-These questions progressively increase in difficulty and test different aspects of SQL querying, from basic SELECT statements to complex window functions and CTEs. They also cover various real-world analytical scenarios that might be encountered when working with movie data.
+### Q12. Write a query to find the birth decade of each director and the average rating of the movies they directed.
+Only include decades where the average rating is greater than 7.0.
+<details>
+<summary>Show SQL</summary>
+
+```
+SELECT 
+    (people.birth / 10) * 10 AS birth_decade,
+    AVG(ratings.rating) AS average_rating
+FROM directors 
+JOIN people  ON directors.people_id = people.id
+JOIN ratings ON directors.movie_id = ratings.movie_id
+GROUP BY birth_decade
+HAVING average_rating > 7.0;
+```
+
+</details>
+
+These questions progressively increase in difficulty and test different aspects of SQL querying, from basic SELECT statements to more complex functions with Multi JOINS. They also cover various real-world analytical scenarios that might be encountered when working with movie data.
